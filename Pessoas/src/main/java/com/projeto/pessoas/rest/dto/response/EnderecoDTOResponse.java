@@ -1,9 +1,7 @@
-package com.projeto.pessoas.rest.dto;
+package com.projeto.pessoas.rest.dto.response;
 
-import com.projeto.pessoas.domain.entity.Pessoa;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EnderecoDTO {
+public class EnderecoDTOResponse {
+
+    @Positive
+    private Integer idEndereco;
 
     @NotEmpty
     private String logradouro;
@@ -22,8 +23,8 @@ public class EnderecoDTO {
     @NotEmpty
     private String numero;
 
-
+    @NotEmpty
     private String cidade;
 
-    private Integer idPessoa;
+    private PessoaDTOResponse pessoa;
 }

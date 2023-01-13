@@ -1,19 +1,20 @@
 package com.projeto.pessoas.rest.service;
 
 import com.projeto.pessoas.domain.entity.Pessoa;
-import com.projeto.pessoas.rest.dto.PessoaDTO;
+import com.projeto.pessoas.rest.dto.request.PessoaDTORequest;
+import com.projeto.pessoas.rest.dto.response.PessoaDTOResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface PessoaService {
 
-    Page<PessoaDTO> findAllPessoa(Pageable pageable);
+    Page<PessoaDTOResponse> findAllPessoa(Pageable pageable);
 
-    Pessoa findPessoa(Integer id);
+    PessoaDTOResponse findPessoa(Integer id);
 
-    Pessoa save(PessoaDTO pessoa);
+    PessoaDTOResponse save(PessoaDTORequest pessoa);
 
-    Pessoa update(PessoaDTO pessoaDTO, Integer id);
+    PessoaDTOResponse update(PessoaDTORequest pessoaDTO, Integer id);
 
     boolean existsPessoa(Integer idPessoa);
 }

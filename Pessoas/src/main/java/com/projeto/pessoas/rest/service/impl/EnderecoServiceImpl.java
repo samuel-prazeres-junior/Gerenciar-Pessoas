@@ -1,9 +1,11 @@
 package com.projeto.pessoas.rest.service.impl;
 
-import com.projeto.pessoas.rest.dto.EnderecoDTO;
 import com.projeto.pessoas.domain.entity.Endereco;
 import com.projeto.pessoas.domain.entity.Pessoa;
 import com.projeto.pessoas.domain.repository.EnderecoRepository;
+import com.projeto.pessoas.domain.repository.PessoaRepository;
+import com.projeto.pessoas.rest.dto.request.EnderecoDTORequest;
+import com.projeto.pessoas.rest.dto.response.EnderecoDTOResponse;
 import com.projeto.pessoas.rest.exception.RecursoNotFoundException;
 import com.projeto.pessoas.rest.service.EnderecoService;
 import lombok.RequiredArgsConstructor;
@@ -19,31 +21,28 @@ public class EnderecoServiceImpl implements EnderecoService {
 
     private final EnderecoRepository repository;
 
-    private final PessoaServiceImpl pessoaService;
-
     private final ModelMapper modelMapper;
-    public Page<EnderecoDTO> findEnderecoByPessoa(Integer id, Pageable pageable){
-        Page<EnderecoDTO> page = repository.findByPessoaId(id, pageable).map(this::toEnderecoDTO);
+
+    private final PessoaRepository pessoaRepository;
+
+    public Page<EnderecoDTOResponse> findEnderecoByPessoa(Integer id, Pageable pageable){
+        Page<EnderecoDTOResponse> page = repository.findByPessoaId(id, pageable).map(this::toEnderecoDTOResponse);
         return page;
     }
 
-    public Endereco save(EnderecoDTO endereco){
-        Endereco enderecoEntity = new Endereco();
-//        Endereco enderecoEntity = modelMapper.map(endereco, Endereco.class);
-        Pessoa pessoa = pessoaService.findPessoa(endereco.getIdPessoa());
-        enderecoEntity.setLogradouro(endereco.getLogradouro());
-        enderecoEntity.setCep(endereco.getCep());
-        enderecoEntity.setCidade(endereco.getCidade());
-        enderecoEntity.setNumero(endereco.getNumero());
+    public EnderecoDTOResponse save(EnderecoDTORequest endereco){
+        Endereco enderecoEntity = toEndereco(endereco);
+        Pessoa pessoa = pessoaRepository.findById(endereco.getIdPessoa()).orElseThrow(() -> new RecursoNotFoundException());
         enderecoEntity.setPessoa(pessoa);
-        return repository.save(enderecoEntity);
+//        enderecoEntity.getPessoa().setEndereco(null);
+        return toEnderecoDTOResponse(repository.save(enderecoEntity));
     }
 
 
     @Transactional
     public void saveMainAddress(Integer idEndereco, Integer idPessoa){
 
-        if (pessoaService.existsPessoa(idPessoa)){ // verificando se o id Existe no banco
+        if (pessoaRepository.existsById(idPessoa)){ // verificando se o id Existe no banco
             Endereco novoPrincipal = repository.findByIdAndPessoaId(idEndereco, idPessoa) // verificando se o id do endereco é um endereco do usuario
                     .orElseThrow((() -> new RecursoNotFoundException("Endereço não encontrado")));
 
@@ -62,7 +61,15 @@ public class EnderecoServiceImpl implements EnderecoService {
         // verificar se o usuario ja nao tem um endereco favoritado, pq se tiver tem que desfavoritar o antigo para favoritar o novo
     }
 
-    public EnderecoDTO toEnderecoDTO(Endereco endereco){
-        return modelMapper.map(endereco, EnderecoDTO.class);
+    public EnderecoDTORequest toEnderecoDTO(Endereco endereco){
+        return modelMapper.map(endereco, EnderecoDTORequest.class);
     }
+    public Endereco toEndereco(EnderecoDTORequest endereco){
+        return modelMapper.map(endereco, Endereco.class);
+    }
+
+    public EnderecoDTOResponse toEnderecoDTOResponse(Endereco endereco){
+        return modelMapper.map(endereco, EnderecoDTOResponse.class);
+    }
+
 }

@@ -3,7 +3,6 @@ package com.projeto.pessoas.rest.service;
 import com.projeto.pessoas.domain.entity.Endereco;
 import com.projeto.pessoas.domain.repository.EnderecoRepository;
 import com.projeto.pessoas.rest.exception.RecursoNotFoundException;
-import com.projeto.pessoas.rest.mock.EnderecoTest;
 import com.projeto.pessoas.rest.service.impl.EnderecoServiceImpl;
 import com.projeto.pessoas.rest.service.impl.PessoaServiceImpl;
 import org.junit.jupiter.api.Assertions;
@@ -30,8 +29,6 @@ class EnderecoServiceTest {
     @Mock
     private EnderecoRepository enderecoRepository;
 
-    @Mock
-    private EnderecoTest enderecoMockado;
 
     @BeforeEach // antes de fazer qualquer metodo execute o que tiver aqui dentro
     void setUp() {
