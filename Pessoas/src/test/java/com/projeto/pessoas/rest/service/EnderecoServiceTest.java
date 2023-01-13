@@ -2,9 +2,9 @@ package com.projeto.pessoas.rest.service;
 
 import com.projeto.pessoas.domain.entity.Endereco;
 import com.projeto.pessoas.domain.repository.EnderecoRepository;
+import com.projeto.pessoas.domain.repository.PessoaRepository;
 import com.projeto.pessoas.rest.exception.RecursoNotFoundException;
 import com.projeto.pessoas.rest.service.impl.EnderecoServiceImpl;
-import com.projeto.pessoas.rest.service.impl.PessoaServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,63 +20,51 @@ import static org.mockito.Mockito.*;
 
 class EnderecoServiceTest {
 
-    @InjectMocks // criar um mock da classe a ser testada
+    @InjectMocks
     private EnderecoServiceImpl enderecoService;
 
     @Mock
-    private PessoaServiceImpl pessoaService;
+    private PessoaRepository pessoaRepository;
 
     @Mock
     private EnderecoRepository enderecoRepository;
 
 
-    @BeforeEach // antes de fazer qualquer metodo execute o que tiver aqui dentro
+    @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this); // basicamente fala que as anotações irão mockar automaticamente
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void personNotFound(){ // teste sempre void
-        when(pessoaService.existsPessoa(anyInt())).thenReturn(false) ; // mockito.any ele fala que aceita qualquer valor do tipo int
-        Assertions.assertThrows(RecursoNotFoundException.class, ()-> enderecoService.saveMainAddress(1,1));
-
+    void personNotFound() {
+        when(pessoaRepository.existsById(anyInt())).thenReturn(false);
+        Assertions.assertThrows(RecursoNotFoundException.class, () -> enderecoService.saveMainAddress(1, 1));
     }
 
     @Test
-    void personFound(){ // teste sempre void
-        when(pessoaService.existsPessoa(anyInt())).thenReturn(true) ; // mockito.any ele fala que aceita qualquer valor do tipo int
-        when(enderecoRepository.findByIdAndPessoaId(anyInt(), anyInt())).thenThrow(RecursoNotFoundException.class); // ele verifica se a exceção que foi dada é a mesma passada
-        Assertions.assertThrows(RecursoNotFoundException.class, ()-> enderecoService.saveMainAddress(1,1)); // assertThrows verifica se em algum lugar da execução do metodo de o erro especificado
-
+    void personFound() {
+        when(pessoaRepository.existsById(anyInt())).thenReturn(true);
+        when(enderecoRepository.findByIdAndPessoaId(anyInt(), anyInt())).thenThrow(RecursoNotFoundException.class);
+        Assertions.assertThrows(RecursoNotFoundException.class, () -> enderecoService.saveMainAddress(1, 1));
     }
 
     @Test
-    void saveMainAddresFound(){ // teste sempre void
-//        Endereco endereco = enderecoMockado.novoEnderecoPrincipal();
+    void saveMainAddresFound() {
         Endereco endereco = new Endereco();
-        when(pessoaService.existsPessoa(anyInt())).thenReturn(true) ; // mockito.any ele fala que aceita qualquer valor do tipo int
-        when(enderecoRepository.findByIdAndPessoaId(anyInt(), anyInt())).thenReturn(Optional.of(endereco)); // ele verifica se a exceção que foi dada é a mesma passada
+        when(pessoaRepository.existsById(anyInt())).thenReturn(true);
+        when(enderecoRepository.findByIdAndPessoaId(anyInt(), anyInt())).thenReturn(Optional.of(endereco));
         when(enderecoRepository.findByPrincipalTrueAndPessoaId(anyInt())).thenReturn(Optional.of(endereco));
-        enderecoService.saveMainAddress(1,1);
-//        verify(enderecoRepository).save(endereco); // verifica se o metodo save esta sendo chamado
+        enderecoService.saveMainAddress(1, 1);
         verify(enderecoRepository, times(2)).save(ArgumentMatchers.any(Endereco.class));
-        // ArgumentMatchers fala basicamente que não importa os argumentos passado desde que seja do tipo Endereco ele aceitara
-        // verify é para verificar se algo foi chamado no caso a repositori o metodo save, times é quantas vezes o metodo foi invicado
-
     }
 
     @Test
-    void saveMainAddressNotFound(){ // teste sempre void
-//        Endereco endereco = enderecoMockado.novoEnderecoPrincipal();
+    void saveMainAddressNotFound() {
         Endereco endereco = new Endereco();
-        when(pessoaService.existsPessoa(anyInt())).thenReturn(true) ; // mockito.any ele fala que aceita qualquer valor do tipo int
-        when(enderecoRepository.findByIdAndPessoaId(anyInt(), anyInt())).thenReturn(Optional.of(endereco)); // ele verifica se a exceção que foi dada é a mesma passada
+        when(pessoaRepository.existsById(anyInt())).thenReturn(true);
+        when(enderecoRepository.findByIdAndPessoaId(anyInt(), anyInt())).thenReturn(Optional.of(endereco));
         when(enderecoRepository.findByPrincipalTrueAndPessoaId(anyInt())).thenReturn(Optional.empty());
-        enderecoService.saveMainAddress(1,1);
-        verify(enderecoRepository).save(endereco); // verifica se o metodo save esta sendo chamado
-
+        enderecoService.saveMainAddress(1, 1);
+        verify(enderecoRepository).save(endereco);
     }
-
-
-
 }

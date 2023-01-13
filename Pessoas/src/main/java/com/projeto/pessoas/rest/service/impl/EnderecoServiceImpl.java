@@ -34,7 +34,6 @@ public class EnderecoServiceImpl implements EnderecoService {
         Endereco enderecoEntity = toEndereco(endereco);
         Pessoa pessoa = pessoaRepository.findById(endereco.getIdPessoa()).orElseThrow(() -> new RecursoNotFoundException());
         enderecoEntity.setPessoa(pessoa);
-//        enderecoEntity.getPessoa().setEndereco(null);
         return toEnderecoDTOResponse(repository.save(enderecoEntity));
     }
 
@@ -42,11 +41,11 @@ public class EnderecoServiceImpl implements EnderecoService {
     @Transactional
     public void saveMainAddress(Integer idEndereco, Integer idPessoa){
 
-        if (pessoaRepository.existsById(idPessoa)){ // verificando se o id Existe no banco
-            Endereco novoPrincipal = repository.findByIdAndPessoaId(idEndereco, idPessoa) // verificando se o id do endereco é um endereco do usuario
+        if (pessoaRepository.existsById(idPessoa)){
+            Endereco novoPrincipal = repository.findByIdAndPessoaId(idEndereco, idPessoa)
                     .orElseThrow((() -> new RecursoNotFoundException("Endereço não encontrado")));
 
-            repository.findByPrincipalTrueAndPessoaId(idPessoa).map(principalAtual ->{ // se ja existir outro endereco como principal ira trocar ele para false
+            repository.findByPrincipalTrueAndPessoaId(idPessoa).map(principalAtual ->{
                 principalAtual.setPrincipal(false);
                 return  repository.save(principalAtual);
             });
@@ -57,8 +56,6 @@ public class EnderecoServiceImpl implements EnderecoService {
         else {
             throw new RecursoNotFoundException("Pessoa não encontrada");
         }
-        // verificar se o id do endereco passado corresponde a um endereco cadastrado pelo usuario(se o endereco é do user)
-        // verificar se o usuario ja nao tem um endereco favoritado, pq se tiver tem que desfavoritar o antigo para favoritar o novo
     }
 
     public EnderecoDTORequest toEnderecoDTO(Endereco endereco){
